@@ -1,0 +1,40 @@
+# Si algú entra al domini .cat sense HTTPS redirigir-lo allí (ja que tinc SSL aprofito...)
+
+Options +Indexes +FollowSymlinks -MultiViews
+RewriteEngine On
+RewriteBase /
+RewriteCond %{SERVER_PORT} 80
+RewriteCond %{HTTP_HOST} ^antondalmau.cat$ [NC]
+RewriteRule ^(.*)$ https://www.antondalmau.cat/ [R=301,L]
+RewriteCond %{SERVER_PORT} 80
+RewriteCond %{HTTP_HOST} ^www.antondalmau.cat$ [NC]
+RewriteRule ^(.*)$ https://www.antondalmau.cat/ [R=301,L]
+
+
+
+# Aprofitant el codi anterior forço a escriure les WWW en algun dels dominis quan l'usuari no ho fa
+# Sempre comprovo que el port sigui el 80, no fos cas qua algun dia vulgués altres tipus de peticions a altres ports
+
+RewriteCond %{SERVER_PORT} 80
+RewriteCond %{HTTP_HOST} ^antondalmau.com$ [NC]
+RewriteRule ^(.*)$ http://www.antondalmau.com/ [R=301,L]
+RewriteCond %{SERVER_PORT} 80
+RewriteCond %{HTTP_HOST} ^antondalmau.es$ [NC]
+RewriteRule ^(.*)$ http://www.antondalmau.es/ [R=301,L]
+
+
+
+# Antigament tenia els idiomes en subdirectoris (ca, en, es) i és possible que algunes pàgines estiguin indexades així.
+# Amb el RedirectMatch 301 puc crear una expressió regular que em digui que si una petició busca el subdirectori /es
+# l'enviï a la URL www.antondalmau.es, i així amb els altres idiomes.
+
+RedirectMatch 301 ^/en(.*)$ http://www.antondalmau.com/
+RedirectMatch 301 ^/es(.*)$ http://www.antondalmau.es/
+RedirectMatch 301 ^/ca(.*)$ https://www.antondalmau.cat/
+
+
+
+# Si no es troba un recurs (per mala indexació o perquè no existeix), vull que capturi l'error 404 i em dirigeixi
+# a la pàgina principal. De moment com que tot està en una única pàgina em serveix.
+
+ErrorDocument 404 https://www.antondalmau.cat/
